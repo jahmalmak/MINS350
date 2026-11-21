@@ -5,6 +5,10 @@ from docx.enum.section import WD_ORIENT
 from docx.oxml.ns import qn
 from docx.oxml import OxmlElement
 
+from pathlib import Path
+BASE = Path(__file__).resolve().parent.parent
+DIAG = BASE / "diagrams"
+
 APP = "CampusConnect"
 
 def shade(cell, hexcolor):
@@ -148,7 +152,7 @@ setw(t, [0.4, 4.4, 1.0, 3.4])
 acc = sum(1 for s in STORIES if s[2] == "ACCEPTED"); rej = len(STORIES) - acc
 d.add_paragraph()
 d.add_paragraph(f"Totals: {len(STORIES)} stories — {acc} accepted, {rej} rejected.").runs[0].bold = True
-d.save("Complete_User_Story_List.docx")
+d.save(BASE / "Complete_User_Story_List.docx")
 assert len(STORIES) == 29 and 18 <= rej <= 22 and 7 <= acc <= 11
 
 # ---------- Level 1 Specification ----------
@@ -245,7 +249,7 @@ d.add_paragraph("Hierarchical feature chart revised after the client interview a
                 "feature areas (1.0–6.0), each decomposed into the specific features the Builder must implement. Feature numbers are used "
                 "to trace user stories, the flow chart, and the data model back to Scope. "
                 "[Submit the photo/scan of your hand-drawn version of this chart alongside or in place of this image.]")
-landscape_pic(d, "Updated_Feature_Chart.png", "Figure 1 — Updated Feature Chart")
+landscape_pic(d, str(DIAG / "Updated_Feature_Chart.png"), "Figure 1 — Updated Feature Chart")
 d.add_paragraph("Feature descriptions:").runs[0].bold = True
 table(d, ["#", "Feature", "Description", "Primary user"], [
  ("1.1", "Sign up / log in", "Account creation with a verified school (.edu) email; log in / log out.", "Student, Organizer"),
@@ -296,7 +300,7 @@ d.add_paragraph("The data model was streamlined to six core entities. Items that
                 "describe another record (category, location, role, interests, verification, notification preferences, bookmarks, "
                 "reminders) are now attributes. The Builder can create the database directly from the schema below "
                 "(full SQL provided in schema.sql and in the appendix).")
-landscape_pic(d, "Data_Model_ERD.png", "Figure 2 — High-Level Data Model (ERD)")
+landscape_pic(d, str(DIAG / "Data_Model_ERD.png"), "Figure 2 — High-Level Data Model (ERD)")
 d.add_paragraph("Entities and key attributes:").runs[0].bold = True
 table(d, ["Entity", "Purpose", "Key attributes (PK / FK in bold in SQL)", "Features"], [
  ("SCHOOL", "Campuses the app supports; maps a .edu email domain to a campus location.", "school_id (PK), name, email_domain, city, state, latitude, longitude", "1.1, 1.3, 2.4"),
@@ -333,7 +337,7 @@ table(d, ["Former entity", "Now stored as", "Why"], [
 d.add_heading("2.4 System Flow Chart", 2)
 d.add_paragraph("Detailed flow of the main paths: onboarding, discovery, engagement, notifications, organizer posting, verification, and moderation. "
                 "Bracketed codes (e.g., [F2.4]) refer to the feature chart. A full-resolution PNG/PDF is provided separately.")
-landscape_pic(d, "Detailed_Flow_Chart.png", "Figure 3 — Detailed System Flow Chart")
+landscape_pic(d, str(DIAG / "Detailed_Flow_Chart.png"), "Figure 3 — Detailed System Flow Chart")
 
 d.add_heading("Appendix — Interview questions used to inform this specification", 2)
 qs = ["Walk through a student's journey from opening the app to finding an event.", "Profile information and how it is used.",
@@ -347,8 +351,8 @@ for i, q in enumerate(qs, 1):
     d.add_paragraph(f"Q{i}. {q}", style='List Number' if False else None)
 
 d.add_heading("Appendix — Database schema (SQL)", 2)
-for line in open("schema.sql").read().splitlines():
+for line in open(BASE / "schema.sql").read().splitlines():
     p = d.add_paragraph(); p.paragraph_format.space_after = Pt(0)
     r = p.add_run(line if line else " "); r.font.name = "Courier New"; r.font.size = Pt(8)
-d.save("Level_1_Specification.docx")
+d.save(BASE / "Level_1_Specification.docx")
 print("built", acc, rej)
