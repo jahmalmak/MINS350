@@ -1,0 +1,132 @@
+digraph Flow {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=22, labelloc=t, nodesep=0.35, ranksep=0.45, pad=0.4,
+         label="CampusConnect — Detailed System Flow Chart (Level 1)\n "];
+  node  [fontname="DejaVu Sans", fontsize=11, shape=box, style="rounded,filled", fillcolor="#E8F1FB", color="#2B5797", penwidth=1.3];
+  edge  [fontname="DejaVu Sans", fontsize=10, color="#444444"];
+
+  start [label="START\nUser opens app", shape=oval, fillcolor="#2B5797", fontcolor=white];
+  logged [label="Logged in?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+
+  subgraph cluster_acct { label="1. Accounts & Profile"; style="rounded,dashed"; color="#2B5797"; fontsize=13;
+    signup [label="Sign up with\nschool (.edu) email\n[F1.1]"];
+    verify [label="Email verified?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    resend [label="Resend verification\nlink"];
+    onboard [label="Onboarding: school, major,\nyear, pick interests\n[F1.2]"];
+    locq [label="Allow location\naccess?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    gps [label="Use device GPS\n[F1.3]"];
+    zip [label="Enter campus / ZIP\nas home base [F1.3]"];
+    radius [label="Set default radius\n(e.g., 1, 5, 10, 25 mi)"];
+  }
+
+  home [label="HOME — Personalized\n\"For You\" feed [F2.1]", fillcolor="#D5E8D4", color="#3B7D3B", penwidth=2];
+  choose [label="What does the\nuser want to do?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+
+  subgraph cluster_disc { label="2. Event Discovery"; style="rounded,dashed"; color="#2B5797"; fontsize=13;
+    browse [label="Scroll feed\n(ranked by interests,\ndistance, date)"];
+    nearby [label="Nearby view:\nmap + list within radius\n[F2.2]"];
+    search [label="Keyword search\n[F2.3]"];
+    filter [label="Apply filters: category, date,\ndistance, cost, host type,\non/off campus [F2.4]"];
+    results [label="Results\nfound?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    widen [label="Suggest: widen radius /\nclear filters / show\nother schools' events"];
+    detail [label="Event Detail page: title, date/time,\nlocation + map, host + verified badge,\ncost, description, RSVP count [F2.5]"];
+  }
+
+  decide [label="Interested?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+  back [label="Back to results / feed"];
+
+  subgraph cluster_eng { label="3. Event Engagement"; style="rounded,dashed"; color="#2B5797"; fontsize=13;
+    action [label="Choose action", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    save [label="Save / bookmark\n[F3.1]"];
+    rsvp [label="RSVP: Going /\nInterested [F3.2]"];
+    share [label="Share link\n[F3.4]"];
+    cal [label="Add to calendar?\n(Google / Apple / Outlook)", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    addcal [label="Export .ics /\ncalendar event [F3.3]"];
+    dirs [label="Get directions\n[F3.5]"];
+  }
+
+  subgraph cluster_notif { label="5. Notifications & Reminders"; style="rounded,dashed"; color="#2B5797"; fontsize=13;
+    prefs [label="Check notification\npreferences & quiet hours\n[F5.4]"];
+    sched [label="Schedule reminders\n(24 h + 1 h before) [F5.1]"];
+    changed [label="Event edited\nor canceled?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    alert [label="Send change /\ncancellation alert [F5.2]"];
+    remind [label="Send reminder\npush / email"];
+    digest [label="Weekly digest of new\nmatching events [F5.3]"];
+  }
+
+  attend [label="Student attends event", shape=oval, fillcolor="#2B5797", fontcolor=white];
+
+  subgraph cluster_org { label="4. Event Creation & Management (Organizers)"; style="rounded,dashed"; color="#8E44AD"; fontsize=13;
+    orgq [label="Verified\norganizer?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    apply [label="Request verification:\nselect type (Club, School Dept,\nBusiness, Community Org)\n+ proof [F4.3]"];
+    form [label="Create Event form [F4.1]\ntitle, date/time, location,\ncategory, cost, description,\nhost, image, audience"];
+    valid [label="Required fields\ncomplete & valid?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    fix [label="Highlight missing /\ninvalid fields"];
+    publish [label="Publish event →\nappears in matching feeds"];
+    manage [label="Organizer dashboard:\nedit / cancel, view RSVPs\n[F4.2, F4.4]"];
+  }
+
+  subgraph cluster_mod { label="6. Trust & Moderation"; style="rounded,dashed"; color="#C0392B"; fontsize=13;
+    report [label="Report event: fake, inappropriate,\ninaccurate, canceled, outdated\n[F6.1]"];
+    queue [label="Admin reviews\nreports [F6.2]"];
+    review [label="Violation\nconfirmed?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    remove [label="Remove / correct event,\nnotify organizer & RSVPs"];
+    keep [label="Keep event,\nclose report"];
+    approve [label="Approve\nverification?", shape=diamond, fillcolor="#FFF4CC", color="#B8860B"];
+    badge [label="Grant verified\nbadge [F6.3]"];
+    deny [label="Deny with reason;\nmay re-apply"];
+    expire [label="Auto-archive event\nafter end time [F6.4]"];
+  }
+
+  endn [label="END", shape=oval, fillcolor="#2B5797", fontcolor=white];
+
+  start -> logged;
+  logged -> home [label="Yes"];
+  logged -> signup [label="No"];
+  signup -> verify;
+  verify -> resend [label="No"]; resend -> verify;
+  verify -> onboard [label="Yes"];
+  onboard -> locq;
+  locq -> gps [label="Yes"]; locq -> zip [label="No"];
+  gps -> radius; zip -> radius; radius -> home;
+
+  home -> choose;
+  choose -> browse [label="Browse"];
+  choose -> nearby [label="Nearby"];
+  choose -> search [label="Search"];
+  choose -> orgq [label="Post event\n(organizer)"];
+  search -> filter; nearby -> filter [style=dashed, label="optional"];
+  browse -> results; filter -> results; nearby -> results;
+  results -> widen [label="No"]; widen -> filter;
+  results -> detail [label="Yes"];
+  detail -> decide;
+  detail -> report [label="Something\nwrong?", style=dashed, color="#C0392B", fontcolor="#C0392B"];
+  decide -> back [label="No"]; back -> choose;
+  decide -> action [label="Yes"];
+  action -> save [label="Save"]; action -> rsvp [label="RSVP"]; action -> share [label="Share"];
+  action -> dirs [label="Directions"];
+  rsvp -> cal; save -> cal;
+  cal -> addcal [label="Yes"];
+  cal -> prefs [label="No"]; addcal -> prefs;
+  prefs -> sched -> changed;
+  changed -> alert [label="Yes"]; changed -> remind [label="No"];
+  alert -> back [style=dashed, label="canceled"];
+  remind -> attend; dirs -> attend;
+  attend -> expire;
+  digest -> home [style=dashed, label="opens app"];
+
+  orgq -> form [label="Yes"];
+  orgq -> apply [label="No"];
+  apply -> approve;
+  approve -> badge [label="Yes"]; approve -> deny [label="No"];
+  badge -> form;
+  form -> valid;
+  valid -> fix [label="No"]; fix -> form;
+  valid -> publish [label="Yes"];
+  publish -> manage;
+  publish -> digest [style=dashed];
+  manage -> changed [style=dashed, label="edit/cancel"];
+
+  report -> queue -> review;
+  review -> remove [label="Yes"]; review -> keep [label="No"];
+  remove -> endn; keep -> endn; expire -> endn; deny -> endn;
+}

@@ -1,0 +1,77 @@
+digraph ERD {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=18, labelloc=t, pad=0.4, nodesep=0.6, ranksep=1.1,
+         label="CampusConnect — High-Level Data Model (6 entities)\n "];
+  node [shape=plain, fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=10, color="#333333", dir=both];
+
+  School [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+    <tr><td bgcolor="#2B5797"><font color="white"><b>SCHOOL</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> school_id</td></tr>
+    <tr><td align="left">name</td></tr>
+    <tr><td align="left">email_domain</td></tr>
+    <tr><td align="left">city, state</td></tr>
+    <tr><td align="left">latitude, longitude</td></tr></table>>];
+
+  User [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+    <tr><td bgcolor="#2B5797"><font color="white"><b>USER</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> user_id</td></tr>
+    <tr><td align="left"><b>FK</b> school_id</td></tr>
+    <tr><td align="left">email, password_hash, email_verified</td></tr>
+    <tr><td align="left">first_name, last_name</td></tr>
+    <tr><td align="left">role (student | organizer | admin)</td></tr>
+    <tr><td align="left">major, class_year</td></tr>
+    <tr><td align="left">interests (list of categories)</td></tr>
+    <tr><td align="left">home_lat, home_lng, radius_miles</td></tr>
+    <tr><td align="left">notify_reminders, notify_digest,<br align="left"/>quiet_start, quiet_end</td></tr>
+    <tr><td align="left">created_at</td></tr></table>>];
+
+  Org [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+    <tr><td bgcolor="#8E44AD"><font color="white"><b>ORGANIZATION</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> org_id</td></tr>
+    <tr><td align="left"><b>FK</b> owner_user_id → USER</td></tr>
+    <tr><td align="left"><b>FK</b> school_id (nullable)</td></tr>
+    <tr><td align="left">name, description, contact_email</td></tr>
+    <tr><td align="left">org_type (club | school_dept |<br align="left"/>business | community)</td></tr>
+    <tr><td align="left">verification_status (pending |<br align="left"/>verified | denied), proof_url</td></tr>
+    <tr><td align="left">verified_at</td></tr></table>>];
+
+  Event [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+    <tr><td bgcolor="#3B7D3B"><font color="white"><b>EVENT</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> event_id</td></tr>
+    <tr><td align="left"><b>FK</b> org_id → ORGANIZATION</td></tr>
+    <tr><td align="left"><b>FK</b> school_id (nullable)</td></tr>
+    <tr><td align="left">title, description, image_url</td></tr>
+    <tr><td align="left">category</td></tr>
+    <tr><td align="left">start_time, end_time</td></tr>
+    <tr><td align="left">venue_name, address,<br align="left"/>latitude, longitude, is_on_campus</td></tr>
+    <tr><td align="left">cost, ticket_url</td></tr>
+    <tr><td align="left">status (active | canceled | archived)</td></tr>
+    <tr><td align="left">created_at, updated_at</td></tr></table>>];
+
+  RSVP [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+    <tr><td bgcolor="#B8860B"><font color="white"><b>RSVP</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> rsvp_id</td></tr>
+    <tr><td align="left"><b>FK</b> user_id, <b>FK</b> event_id</td></tr>
+    <tr><td align="left">status (saved | interested | going)</td></tr>
+    <tr><td align="left">reminder_sent</td></tr>
+    <tr><td align="left">created_at</td></tr></table>>];
+
+  Report [label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+    <tr><td bgcolor="#C0392B"><font color="white"><b>REPORT</b></font></td></tr>
+    <tr><td align="left"><b>PK</b> report_id</td></tr>
+    <tr><td align="left"><b>FK</b> event_id, <b>FK</b> reporter_id → USER</td></tr>
+    <tr><td align="left">reason (fake | inappropriate |<br align="left"/>inaccurate | canceled | outdated)</td></tr>
+    <tr><td align="left">details</td></tr>
+    <tr><td align="left">status (open | resolved | dismissed)</td></tr>
+    <tr><td align="left"><b>FK</b> resolved_by → USER (admin)</td></tr>
+    <tr><td align="left">created_at</td></tr></table>>];
+
+  School -> User  [arrowtail=tee, arrowhead=crow, label="1 : many\nattends"];
+  User -> Org     [arrowtail=tee, arrowhead=crow, label="1 : many\nmanages"];
+  Org -> Event    [arrowtail=tee, arrowhead=crow, label="1 : many\nhosts"];
+  User -> RSVP    [arrowtail=tee, arrowhead=crow, label="1 : many"];
+  Event -> RSVP   [arrowtail=tee, arrowhead=crow, label="1 : many"];
+  User -> Report  [arrowtail=tee, arrowhead=crow, label="1 : many\nfiles"];
+  Event -> Report [arrowtail=tee, arrowhead=crow, label="1 : many"];
+  School -> Event [arrowtail=teeodot, arrowhead=crow, style=dashed, label="0..1 : many\nlocated at"];
+}
